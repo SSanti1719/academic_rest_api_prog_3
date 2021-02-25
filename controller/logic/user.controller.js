@@ -14,25 +14,26 @@ exports.login = (req, res, next) => {
         }
         if (data.length > 0) {
             let pass = helper.DecryptPassword(data[0].password)
-            if (req.body.password===pass) {
-                tk=helper.GenerateToken(data[0])
+            if (req.body.password === pass) {
+                tk = helper.GenerateToken(data[0])
                 return res.status(200).json(
                     {
-                        token:tk
+                        token: tk
                     }
                 )
-            }else{
+            } else {
                 return res.status(400).json(
                     {
-                        info:"Username or password is incorrect"
+                        info: "Username or password is incorrect"
                     }
                 )
             }
-            res.status(200).json(
+        } else {
+            return res.status(400).json(
                 {
-                    info: data
+                    info: "Username or password is incorrect"
                 }
-            );
+            )
         }
     });
 };
