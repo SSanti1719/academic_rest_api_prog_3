@@ -13,14 +13,14 @@ schema.statics = {
     getAll: function (query, cb) {
         this.find(query,cb);
     },
-    getByCode: function (query, cb) {
+    getById: function (query, cb) {
         this.find(query,cb);
     },
     update: function (query,data, cb) {
         this.findOneAndUpdate(query,{$set:data},{new:true},cb);
     },
     delete: function(query,cb){
-        this.findOneAndDelete(query);
+        this.findOneAndDelete(query,cb);
     }
 }
 const dto=mongoose.model("coll_group",schema);

@@ -35,20 +35,29 @@ exports.createStudent = (req, res, next) => {
             if (err) {
                 console.log(err);
                 studentDto.delete({ _id: data._id }, (e, data) => {
-                    return res.status(400).json(
-                        {
-                            error: err
-                        }
-                    );
+                    if (e) {
+                        return res.status(400).json(
+                            {
+                                error: err
+                            }
+                        );
+
+                    } res.status(204).json()
                 });
+                return res.status(400).json(
+                    {
+                        error: err
+                    }
+                );
+
             }
             notHelper.sendSMS(std.phone, user);
-            res.status(201).json(
-                {
-                    info: data
-                }
-            )
         });
+        res.status(201).json(
+            {
+                info: data
+            }
+        )
     });
 };
 
@@ -67,6 +76,33 @@ exports.updateStudent = (req, res, next) => {
             return res.status(400).json(
                 {
                     error: err
+                }
+            );
+        }
+        if (req.body.oldcode != undefined) {
+            let r = config.get("roles").student;
+            let user = {
+                name: req.body.name,
+                lastname: req.body.lastname,
+                username: req.body.code,
+                password: helper.EncryptPassword(req.body.password),
+                role: r
+            };
+            console.log(req);
+            userDto.update({ username: req.body.oldcode }, user, (err, u) => {
+                if (err) {
+                    return res.status(400).json(
+                        {
+                            error: err
+                        }
+                    );
+                }
+                notHelper.sendSMS(std.phone, user);
+            });
+        } else {
+            res.status(400).json(
+                {
+                    info: "El numero de documento no puede estar vacío!"
                 }
             );
         }
@@ -125,6 +161,20 @@ exports.deleteStudent = () => {
                 }
             );
         }
-        res.status(204).json()
+        userDto.delete({username:data.code},(err,data)=>{
+            if (err) {
+                return res.status(400).json(
+                    {
+                        error:err
+                    }
+                )
+            }
+        });
+        res.status(200).json(
+            {
+                info:"El estudiante ha sido borrado",
+                data:data
+            }
+        )
     });
 };
